@@ -76,5 +76,5 @@ module.exports = {
     dataDir: path.resolve(path.join(__dirname, '../../'), envVars.ACTUAL_DATA_DIR),
     password: envVars.ACTUAL_PASSWORD,
     syncId: envVars.ACTUAL_BUDGET_SYNC_ID,
-  }
+  },
 };

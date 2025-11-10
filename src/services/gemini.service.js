@@ -19,7 +19,11 @@ const model = genAI.getGenerativeModel({
 const determineIntent = async (text) => {
   try {
     const intentZodSchema = z.object({
-      intent: z.enum(['transaction', 'question', 'query_balance']).describe('The determined intent of the user input. "transaction" for financial recordings, "query_balance" for asking about account or budget balances, "question" for everything else.'),
+      intent: z
+        .enum(['transaction', 'question', 'query_balance'])
+        .describe(
+          'The determined intent of the user input. "transaction" for financial recordings, "query_balance" for asking about account or budget balances, "question" for everything else.'
+        ),
       transactionDetail: z
         .enum(['expense', 'income', 'transfer'])
         .describe(
@@ -82,12 +86,10 @@ const processTransaction = async (text, accountNames, categoryNames) => {
         ),
       source_account_name: z
         .enum(accountNames)
-        .describe('The account the money is coming from, chosen from the provided list. Chose Other if can not be determined'),
-      message_to_user: z
-        .string()
         .describe(
-          "A short summary on what you just done, use emojis if necessary."
+          'The account the money is coming from, chosen from the provided list. Chose Other if can not be determined'
         ),
+      message_to_user: z.string().describe('A short summary on what you just done, use emojis if necessary.'),
     });
 
     // 2. Convert the Zod schema to a JSON schema
@@ -171,7 +173,10 @@ User message: "${text}"`;
     return validatedData;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Gemini response validation error (processBalanceQuery): ${error.message}`);
+      throw new ApiError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        `Gemini response validation error (processBalanceQuery): ${error.message}`
+      );
     }
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Gemini API Error (processBalanceQuery): ${error.message}`);
   }

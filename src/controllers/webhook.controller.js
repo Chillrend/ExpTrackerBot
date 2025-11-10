@@ -3,6 +3,11 @@ const catchAsync = require('../utils/catchAsync');
 const { geminiService, wahaService, actualService } = require('../services');
 const { WebhookEvent } = require('../models');
 
+const formatIDR = (amount) => {
+  // Formats a number into IDR currency string, e.g., 150000 -> Rp 150.000,00
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+};
+
 const handleWebhook = catchAsync(async (req, res) => {
   // Here you can process the webhook payload.
   // The payload is available in req.body after being parsed and validated.
@@ -63,7 +68,9 @@ const handleWebhook = catchAsync(async (req, res) => {
           const today = new Date().toISOString().split('T')[0]; // Today's date in YYYY-MM-DD
 
           if (transactionDetail === 'transfer') {
-            const destinationAccount = accounts.find((acc) => acc.name.toLowerCase() === transactionData.payee.toLowerCase());
+            const destinationAccount = accounts.find(
+              (acc) => acc.name.toLowerCase() === transactionData.payee.toLowerCase()
+            );
             if (!destinationAccount) {
               finalResponse = `Sorry, I couldn't find a destination account named "${transactionData.payee}" for the transfer.`;
             } else {
@@ -85,14 +92,14 @@ const handleWebhook = catchAsync(async (req, res) => {
                   amount: -Math.abs(amountInCents),
                   payee: destinationTransferPayee.id,
                   notes: transactionData.description || `Transfer to ${destinationAccount.name}`,
-                  cleared: false
+                  cleared: false,
                 };
                 const deposit = {
                   date: today,
                   amount: Math.abs(amountInCents),
                   payee: sourceTransferPayee.id,
                   notes: transactionData.description || `Transfer from ${account.name}`,
-                  cleared: false
+                  cleared: false,
                 };
                 // Add the withdrawal to the source account and the deposit to the destination account.
                 await actualService.addTransactions(account.id, [withdrawal]);
@@ -114,7 +121,7 @@ const handleWebhook = catchAsync(async (req, res) => {
                 notes: transactionData.description,
                 category: category.id,
                 payee_name: transactionData.payee,
-                cleared: false
+                cleared: false,
               };
               await actualService.addTransactions(account.id, [newTransaction]);
               finalResponse = transactionData.message_to_user;
@@ -125,7 +132,7 @@ const handleWebhook = catchAsync(async (req, res) => {
         }
       } catch (error) {
         console.error('Error during Actual Budget integration:', error);
-        finalResponse = "Sorry, I encountered an error while processing your transaction with Actual Budget.";
+        finalResponse = 'Sorry, I encountered an error while processing your transaction with Actual Budget.';
         // Re-throw the error to be caught by catchAsync and logged properly
         throw error;
       } finally {
@@ -143,7 +150,7 @@ const handleWebhook = catchAsync(async (req, res) => {
         console.log('Balance query data:', queryData);
 
         if (queryData.query_type === 'account') {
-          let responseParts = [];
+          const responseParts = [];
           if (queryData.name.toLowerCase() === 'all') {
             responseParts.push('*🏦 All Account Balances:*');
             // Create an array of promises to fetch all account balances concurrently
@@ -172,7 +179,7 @@ const handleWebhook = catchAsync(async (req, res) => {
         } else if (queryData.query_type === 'budget' || queryData.query_type === 'summary') {
           const month = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
           const budgetData = await actualService.getBudgetMonth(month);
-          console.log(budgetData)
+          console.log(budgetData);
 
           if (queryData.name && queryData.name.toLowerCase() !== 'all') {
             const category = budgetData.categorGroups
@@ -189,7 +196,7 @@ const handleWebhook = catchAsync(async (req, res) => {
             }
           } else {
             // Summary of all budgets
-            let responseParts = ['*📊 Monthly Budget Summary:*'];
+            const responseParts = ['*📊 Monthly Budget Summary:*'];
             budgetData.categoryGroups.forEach((group) => {
               if (!group.is_income) {
                 responseParts.push(`\n*${group.name}*`);
@@ -221,11 +228,6 @@ const handleWebhook = catchAsync(async (req, res) => {
 
   res.status(httpStatus.OK).send({ status: 'received' });
 });
-
-const formatIDR = (amount) => {
-  // Formats a number into IDR currency string, e.g., 150000 -> Rp 150.000,00
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
-};
 
 module.exports = {
   handleWebhook,
