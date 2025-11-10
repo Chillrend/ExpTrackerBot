@@ -8,7 +8,7 @@ COPY package.json package-lock.json ./
 
 USER node
 
-RUN npm ci
+RUN npm i
 
 COPY --chown=node:node . .
 
