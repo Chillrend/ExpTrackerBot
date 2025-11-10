@@ -4,6 +4,7 @@ services:
   node-app:
     build: .
     image: node-app
+    env_file: .env
     ports:
       - '6000:3000'
     depends_on:
