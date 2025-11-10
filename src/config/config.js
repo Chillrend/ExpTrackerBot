@@ -26,6 +26,10 @@ const envVarsSchema = Joi.object()
     GEMINI_API_KEY: Joi.string().required().description('Gemini API key'),
     WAHA_BASE_URL: Joi.string().required().description('WAHA Base URL'),
     WAHA_API_KEY: Joi.string().required().description('WAHA API key'),
+    ACTUAL_SERVER_URL: Joi.string().required().description('Actual server URL'),
+    ACTUAL_DATA_DIR: Joi.string().required().description('Actual data directory'),
+    ACTUAL_PASSWORD: Joi.string().required().description('Actual password'),
+    ACTUAL_BUDGET_SYNC_ID: Joi.string().required().description('Actual budget sync ID'),
   })
   .unknown();
 
@@ -40,11 +44,7 @@ module.exports = {
   port: envVars.PORT,
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
-    options: {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
+    options: {},
   },
   jwt: {
     secret: envVars.JWT_SECRET,
@@ -71,4 +71,10 @@ module.exports = {
     baseUrl: envVars.WAHA_BASE_URL,
     apiKey: envVars.WAHA_API_KEY,
   },
+  actual: {
+    serverURL: envVars.ACTUAL_SERVER_URL,
+    dataDir: path.resolve(path.join(__dirname, '../../'), envVars.ACTUAL_DATA_DIR),
+    password: envVars.ACTUAL_PASSWORD,
+    syncId: envVars.ACTUAL_BUDGET_SYNC_ID,
+  }
 };

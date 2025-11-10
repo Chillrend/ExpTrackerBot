@@ -162,8 +162,23 @@ JWT_SECRET=thisisasamplesecret
 JWT_ACCESS_EXPIRATION_MINUTES=30
 # Number of days after which a refresh token expires
 JWT_REFRESH_EXPIRATION_DAYS=30
+# Number of minutes after which a reset password token expires
+JWT_RESET_PASSWORD_EXPIRATION_MINUTES=10
+# Number of minutes after which a verify email token expires
+JWT_VERIFY_EMAIL_EXPIRATION_MINUTES=10
+
 # Gemini API Key
 GEMINI_API_KEY=
+
+# WAHA (WhatsApp HTTP API) Configuration
+WAHA_BASE_URL=http://localhost:3001
+WAHA_API_KEY=your-waha-api-key
+
+# Actual Budget Configuration
+ACTUAL_SERVER_URL=http://localhost:5006
+ACTUAL_DATA_DIR=actual
+ACTUAL_PASSWORD=your-actual-password
+ACTUAL_BUDGET_SYNC_ID=your-budget-sync-id
 
 # SMTP configuration options for the email service
 # For testing, you can use a fake SMTP service like Ethereal: https://ethereal.email/create
